@@ -30,9 +30,10 @@
 
                             <div class="col-md-6">
                                 <select class="form-select" aria-label="Default select example" name="role" id="role">
-                                    <option selected>-- Pilih --</option>
-                                    <option value="2">Pegawai Pemerintah Daerah / PNS </option>
+                                    {{-- <option selected> </option> --}}
                                     <option value="0">Masyarakat Sipil</option>
+                                    <option value="2">Pegawai Pemerintah Daerah / PNS </option>
+                                    
                                   </select>
                                 @error('role')
                                     <span class="invalid-feedback" role="alert">
@@ -82,7 +83,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row mb-3">
+                        {{-- <div class="form-group row mb-3">
                             <label for="captcha" class="col-md-4 col-form-label text-md-end">Captcha</label>
                             <div class="col-md-6 captcha">
                                 <span>{!! captcha_img() !!}</span>
@@ -96,7 +97,7 @@
                             <div class="col-md-6">
                                 <input id="captcha" type="text" class="form-control" placeholder="Enter Captcha" name="captcha">
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="row mb-3">
                             <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>

@@ -15,6 +15,8 @@ use App\Models\sk_hukuman_disiplin_detail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use App\Models\Pengaduan;
+use App\Models\Pengaduan_message;
 
 
 
@@ -67,7 +69,8 @@ class UserController extends Controller
         */
         // ambil nilai ID terakhir dari tabel A
         
-        $lastID = Consult_room::orderBy('id', 'desc')->first()->id;
+          //$lastID = Consult_room::orderBy('id', 'desc')->first()->id;
+          $lastID = optional(Consult_room::orderBy('id', 'desc')->first())->id;
 
         // tambahkan 1 pada nilai ID terakhir dan konversi ke string
         $nextID = (string) ($lastID + 1);
@@ -179,7 +182,7 @@ class UserController extends Controller
         //$userID = Auth::user()->id;
         $iduser = Auth::user()->id;
         $userData = User::where('id',$iduser)->get();
-        $dt = sk_bebas_temuan_detail::where('id_permohonan',$id)->get();
+        $dt = sk_bebas_temuan_detail::where('id',$id)->get();
         $user = Auth::user()->name;
         $sbt = sk_bebas_temuan::where('id',$id)->pluck('status')->first();
         $data = [
@@ -446,7 +449,7 @@ class UserController extends Controller
         //$userID = Auth::user()->id;
         $iduser = Auth::user()->id;
         $userData = User::where('id',$iduser)->get();
-        $dt = sk_hukuman_disiplin_detail::where('id_permohonan',$id)->get();
+        $dt = sk_hukuman_disiplin_detail::where('id',$id)->get();
         $user = Auth::user()->name;
         $sktp = sk_hukuman_disiplin::where('id',$id)->pluck('status')->first();
         $data = [
@@ -516,6 +519,137 @@ class UserController extends Controller
             
             return redirect('/layanan_administrasi/surat_keterangan_tidak_pernah_dijatuhi_hukuman_disiplin')->with('error');
         }
+    }
+
+    public function addpengaduan()
+    {
+        /* 
+        STATUS ROOM KONSULTASI
+        0 = Menunggu balasan admmin
+        */
+        // ambil nilai ID terakhir dari tabel A
+        
+          //$lastID = Consult_room::orderBy('id', 'desc')->first()->id;
+        $lastID = optional(Consult_room::orderBy('id', 'desc')->first())->id;
+
+        // tambahkan 1 pada nilai ID terakhir dan konversi ke string
+        $nextID = (string) ($lastID + 1);
+
+        // tambahkan angka 0 pada depan ID hingga panjangnya 2
+        $nextID = str_pad($nextID, 2, '0', STR_PAD_LEFT);
+        $dt=Carbon::now();
+        $time=$dt->format('Ymdhs');
+        // gabungkan awalan 'CI' dengan ID yang sudah diproses
+        $customID = 'AD' .$time ; 
+        $user = Auth::user()->name;
+        $id = Auth::user()->id;
+        $userData = User::where('id',$id)->get();
+        $data = [
+            'user'=> $user,
+            'userData' => $userData,
+            'id_room'=>$customID
+        ];
+        return view('contentUser.pengaduan_baru',$data);
+    }
+    public function pengaduan()
+    {
+        $userID = Auth::user()->id;
+        $pengaduan = Pengaduan::where('id_user',$userID)->paginate(5);
+        $user = Auth::user()->name;
+        $data = [
+            'user'=> $user,
+            'aduan'=>$pengaduan
+        ];
+        return view('contentUser.pengaduan',$data);
+    }
+    public function add_aduan(Request $request)
+    {
+        $userID = Auth::user()->id;
+        $request->validate(
+        [
+            'nama_terlapor'  => 'required',
+            'jabatan_pekerjaan' => 'required',
+            'alamat' => 'required',
+            'tempat_kejadian' => 'required',
+            'waktu_kejadian' => 'required',
+            'uraian' => 'required'
+        ]);
+        if($request->file('aduan_file') == "") {
+            $data = Pengaduan_message::create([
+                'UserID' => $userID,
+                'room_id' => $request['idroom'],
+                'nama_terlapor'  => $request['nama_terlapor'],
+                'jabatan_pekerjaan' => $request['jabatan_pekerjaan'],
+                'alamat' => $request['alamat'],
+                'tempat_kejadian' => $request['tempat_kejadian'],
+                'waktu_kejadian' => $request['waktu_kejadian'],
+                'uraian' => $request['uraian'],
+                'status'=> '1'            
+            ]);
+            $room = Pengaduan::create([
+                'id_admin'=>'0',
+                'id_user'=> $userID,
+                'roomID'=> $request['idroom'],
+                'status'=>'0',
+            ]);
+        }else{
+            $fileName = time().'.'.$request->aduan_file->extension();  
+            $request->aduan_file->move(public_path().'/adminfrontend/aduanfile/', $fileName);
+            $now = Carbon::now();
+            $timenow = now();
+            $data = Pengaduan_message::create([
+                'UserID' => $userID,              
+                'room_id' => $request['idroom'],
+                'message' => $request['pertanyaan'],
+                'nama_terlapor'  => $request['nama_terlapor'],
+                'jabatan_pekerjaan' => $request['jabatan_pekerjaan'],
+                'alamat' => $request['alamat'],
+                'tempat_kejadian' => $request['tempat_kejadian'],
+                'waktu_kejadian' => $request['waktu_kejadian'],
+                'uraian' => $request['uraian'],
+                'aduan_file'=> $fileName,
+                'status'=> '1'            
+            ]);
+            $userID = Auth::user()->id;
+            $room = Pengaduan::create([
+                'id_admin'=>'0',
+                'id_user'=> $userID,
+                'roomID'=> $request['idroom'],
+                'status'=>'0'
+            ]);
+        }
+        if($data && $room){
+            //redirect dengan pesan sukses
+            return redirect()->route('pengaduan')->with('success','Aduan berhasil ditambahkan.');
+        }else{
+            //redirect dengan pesan error
+            return redirect()->back()->with('error');
+        
+        }
+    
+    }
+    public function pengaduan_detail($roomID)
+    {
+        /*
+        Status Message
+        1 = Muncul Di User
+        0 = Belum di assign oleh Verifikator
+        2 = Menunggu persetujuan Superadmin
+        3 = Irban diminta melakukan Perbaikan
+        */
+        $room = Pengaduan::where('roomID',$roomID)->get();
+        $user = Auth::user()->name;
+        $IDuser = Auth::user()->id;
+        $chat = Pengaduan_message::where('room_id',$roomID)->where('status',1)->orderBy('id','asc')->get(); 
+        $firstID = Pengaduan_message::where('room_id',$roomID)->orderBy('id','asc')->pluck('UserID')->first();
+        $data = [
+            'user'=> $user,
+            'IDuser'=>$IDuser,
+            'chat'=> $chat,
+            'room'=>$room,
+            'firstID'=>$firstID,
+        ];
+        return view('contentUser.pengaduan_detail',$data);     
     }
     
     

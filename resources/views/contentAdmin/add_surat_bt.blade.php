@@ -402,7 +402,7 @@
                                 Buat Surat Bebas Temuan
                             </button>
                             @else
-                            <a type="button" class="btn btn-danger" href="http://127.0.0.1:8000/surat_bebas_temuan_pemeriksaan/{{$suratid}}" target="_blank">
+                            <a type="button" class="btn btn-danger" href="/surat_bebas_temuan_pemeriksaan/{{$suratid}}" target="_blank">
                              <i class="fas fa-print" ></i>   Preview
                             </a>
                             @endif

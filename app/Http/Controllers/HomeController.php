@@ -16,6 +16,10 @@ use App\Models\sk_hukuman_disiplin_detail;
 use App\Models\Surat_bebas_temuan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Models\Pengaduan;
+use App\Models\Pengaduan_message;
+
 class HomeController extends Controller
 {
     /**
@@ -46,6 +50,10 @@ class HomeController extends Controller
         $totMas = User::Where('is_admin',2)->select('id')->get()->count();
         $totConsult=Consult_room::where('status',0 )->select('id')->get()->count();
         $totConsDone=Consult_room::where('status',1 )->select('id')->get()->count();
+
+        $totAduan=Pengaduan::where('status',0 )->select('id')->get()->count();
+        $totAduanDone=Pengaduan::where('status',1 )->select('id')->get()->count();
+
         //surat_bebas_temuan
         $sbtnew= sk_bebas_temuan::where('status',0 )->select('id')->get()->count();
         $sbtprocess= sk_bebas_temuan::whereBetween('status',[1, 4] )->select('id')->get()->count();
@@ -65,6 +73,8 @@ class HomeController extends Controller
             'totMas'=>$totMas,
             'totConsult'=>$totConsult,
             'totConsDone'=>$totConsDone,
+            'totAduan'=>$totAduan,
+            'totAduanDone'=>$totAduanDone,
             'sbtnew'=>$sbtnew,
             'sbtprocess'=>$sbtprocess,
             'sbtaccept'=>$sbtaccept,
@@ -172,12 +182,12 @@ class HomeController extends Controller
         if($request->status === '1'){
             
             DB::transaction(function () use ($request,$id) {
-                DB::table('Consult_messages')
+                DB::table('consult_messages')
                 ->where('id', $id)
                 ->update([
                     'status' => $request->input('status')
                 ]);
-                DB::table('Consult_rooms')
+                DB::table('consult_rooms')
                 ->where('roomID',$request->idroom)
                 ->update([
                     'status' => '1'
@@ -248,12 +258,34 @@ class HomeController extends Controller
         $userID = Auth::user()->id;
         $now = Carbon::now();
         $timenow = now();
-        $data = Consult_message::create([
-            'UserID' => $userID,
-            'room_id' => $request['idroom'],
-            'message' => $request['comment'],
-            'status'=> '0'            
-        ]);
+        $request->validate(
+            [
+                'files' => 'mimes:jpeg,bmp,png,gif,svg,pdf,zip,rar',
+    
+            ]);
+        if ($request->hasFile('files')) {
+            
+            $file = $request->file('files');
+            $extension = $file->getClientOriginalExtension();
+            $filename = Str::random(10) . '.' . $extension;
+            $file->move(public_path('adminfrontend/consultfile'), $filename);
+
+            $data = Consult_message::create([
+                'UserID' => $userID,
+                'room_id' => $request['idroom'],
+                'message' => $request['comment'],
+                'status'=> '0',
+                'consult_file'=> $filename,
+            ]);
+        }else{
+            $data = Consult_message::create([
+                'UserID' => $userID,
+                'room_id' => $request['idroom'],
+                'message' => $request['comment'],
+                'status'=> '0'            
+            ]);
+        }
+        
         if($data){
             //redirect dengan pesan sukses
             return redirect()->back()->with('successs');
@@ -519,5 +551,101 @@ class HomeController extends Controller
             ]);
         });
         return redirect()->back()->with('successs');
+    }
+    public function daftar_pengaduan()
+    {
+        $isAdmin = Auth::user()->is_admin;
+        $userID = Auth::user()->id;
+        $pengaduan = Pengaduan::orderBy('created_at','desc')->paginate(5);
+        $user = Auth::user()->name;
+        $data = [
+            'isAdmin'=> $isAdmin,
+            'user'=> $user,
+            'aduan'=>$pengaduan
+        ];
+        return view('contentAdmin.pengaduan',$data);
+    }
+    public function pengaduan_detail($roomID)
+    {
+        /*
+        Status Message
+        1 = Muncul Di User
+        0 = Belum di assign oleh Verifikator
+        2 = Menunggu persetujuan Superadmin
+        3 = Irban diminta melakukan Perbaikan
+        */
+        $idadmin = Pengaduan::where('roomID',$roomID)->pluck('id_admin')->first();
+        $idpelapor= Pengaduan::where('roomID',$roomID)->pluck('id_user')->first();
+        $UserRespon = User::where('id',$idadmin)->pluck('name')->first();
+        $DataUser = User::where('id',$idpelapor)->get();
+        $isAdmin = Auth::user()->is_admin;
+        $room = Pengaduan::where('roomID',$roomID)->get();
+        $user = Auth::user()->name;
+        $IDuser = Auth::user()->id;
+        $chat = Pengaduan_message::where('room_id',$roomID)->where('status',1)->orderBy('id','asc')->get(); 
+        $firstID = Pengaduan_message::where('room_id',$roomID)->orderBy('id','asc')->pluck('UserID')->first();
+        $data = [
+            'isAdmin'=> $isAdmin,
+            'user'=> $user,
+            'IDuser'=>$IDuser,
+            'chat'=> $chat,
+            'room'=>$room,
+            'roomID'=>$roomID,
+            'firstID'=>$firstID,
+            'UserRespon'=> $UserRespon,
+            'DataUser'=>$DataUser
+        ];
+        return view('contentAdmin.pengaduan_detail',$data);     
+    }
+
+    public function addMessage_aduan(Request $request, $id)
+    {
+        $IDuser = Auth::user()->id;
+        $now = Carbon::now();
+        $timenow = now();
+        $idroom = Pengaduan_message::where('id',$id)->pluck('room_id')->first();
+        $request->validate(
+            [
+                'files' => 'mimes:jpeg,bmp,png,gif,svg,pdf,zip,rar',
+    
+            ]);
+        if ( $request->hasFile('files')) {
+
+            $file = $request->file('files');
+            $extension = $file->getClientOriginalExtension();
+            $filename = Str::random(10) . '.' . $extension;
+            $file->move(public_path('adminfrontend/aduanfile'), $filename);
+            $msg = Pengaduan_message::findOrFail($id);
+            $msg->update([
+            'message'=>$request['comment'],
+            'message_file'=>$filename,
+            'status'=>1
+            ]);
+            $pengaduan = Pengaduan::where('roomID',$idroom);
+            $pengaduan->update([
+                    'id_admin'=> $IDuser,
+                    'status'=>1,
+                ]);
+            }else{
+                $msg = Pengaduan_message::findOrFail($id);
+                $msg->update([
+                'message'=>$request['comment'],
+                'status'=>1
+                ]);
+                $pengaduan = Pengaduan::where('roomID',$idroom);
+                $pengaduan->update([
+                        'id_admin'=> $IDuser,
+                        'status'=>1,
+                    ]);
+            }
+            
+            if($msg && $pengaduan){
+            //redirect dengan pesan sukses
+            return redirect()->back()->with('successs');
+            }else{
+                //redirect dengan pesan error
+                return redirect()->back()->with('error');
+            
+        }
     }
 }

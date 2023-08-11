@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Consult_message extends Model
+class Pengaduan extends Model
 {
     use HasFactory;
     protected $fillable = [
         'id',
-        'UserID',
-        'room_id',
-        'message',
-        'consult_file',
+        'roomID',
+        'file_name',
+        'id_user',
+        'id_admin',
         'status'
     ];
 }

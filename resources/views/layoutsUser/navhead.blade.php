@@ -192,7 +192,7 @@
 								</ul>
 							</div>
 						</li> 
-						<li class="nav-item {{ request()->is('konsultasi_pengaduan/konsultasi_online')? 'active':''}}">
+						<li class="nav-item {{ request()->is('konsultasi_pengaduan/konsultasi_online','konsultasi_pengaduan/pengaduan')? 'active':''}}">
 							<a data-toggle="collapse" href="#adm">
 								<i class="fas fa-info-circle"></i>
 								<p>Konsultasi & Pengaduan</p>
@@ -206,7 +206,7 @@
 										</a>
 									</li>
 									<li>
-										<a href="/register">
+										<a href="/konsultasi_pengaduan/pengaduan">
 											<span class="sub-item">Pengaduan</span>
 										</a>
 									</li>

@@ -43,6 +43,11 @@ Route::get('/layanan_administrasi/surat_keterangan_tidak_pernah_dijatuhi_hukuman
 Route::get('/layanan_administrasi/surat_keterangan_tidak_pernah_dijatuhi_hukuman_disiplin/permohonan_baru/{id}', [App\Http\Controllers\UserController::class, 'addsktp'])->name('addsktp');//->middleware('checkUserLevel');
 Route::post('add_sktp_request', [App\Http\Controllers\UserController::class, 'add_sktp_request'])->name('add_sktp_request');    
 Route::get('/surat/{id}', [App\Http\Controllers\UserController::class, 'template_sbt'])->name('template_sbt');//->middleware('checkUserLevel');
+Route::get('/konsultasi_pengaduan/pengaduan', [App\Http\Controllers\UserController::class, 'pengaduan'])->name('pengaduan');
+Route::get('/konsultasi_pengaduan/pengaduan/buat_aduan', [App\Http\Controllers\UserController::class, 'addpengaduan'])->name('addpengaduan');//->middleware('checkUserLevel');
+Route::post('add_aduan', [App\Http\Controllers\UserController::class, 'add_aduan'])->name('add_aduan');    
+Route::get('/konsultasi_pengaduan/pengaduan/pengaduan_detail/{roomID}', [App\Http\Controllers\UserController::class, 'pengaduan_detail'])->name('pengaduan_detail');
+
 
 
 
@@ -61,8 +66,11 @@ Route::get('/konsultasi_online/daftar_konsultasi/konsultasi_detail/{roomID}', [A
 Route::post('updateStatus/{id}', [App\Http\Controllers\HomeController::class, 'update'])->name('updateStatus')->middleware('admin');
 Route::put('updateMessage/{id}', [App\Http\Controllers\HomeController::class, 'updateMessage'])->name('updateMessage')->middleware('admin');    
 Route::post('updateComment/{id}', [App\Http\Controllers\HomeController::class, 'updateComment'])->name('updateComment')->middleware('admin');    
-
 Route::post('addMessage', [App\Http\Controllers\HomeController::class, 'addMessage'])->name('addMessage');    
+Route::get('/konsultasi_online/daftar_pengaduan', [App\Http\Controllers\HomeController::class, 'daftar_pengaduan'])->name('daftar_pengaduan');
+Route::get('/konsultasi_online/daftar_pengaduan/detail_aduan/{roomID}', [App\Http\Controllers\HomeController::class, 'pengaduan_detail'])->name('pengaduan_details');
+Route::put('addMessage_aduan/{id}', [App\Http\Controllers\HomeController::class, 'addMessage_aduan'])->name('addMessage_aduan')->middleware('admin');    
+
 
 Route::get('/surat_bebas_temuan_pemeriksaan', [App\Http\Controllers\HomeController::class, 'sbt'])->name('sbt');//->middleware('checkUserLevel');
 Route::get('/surat_keterangan_tidak_pernah_dijatuhi_hukuman_disiplin', [App\Http\Controllers\HomeController::class, 'sktp'])->name('sktp');//->middleware('checkUserLevel');
@@ -78,6 +86,8 @@ Route::post('updateSbt/{id}', [App\Http\Controllers\HomeController::class, 'upda
 Route::post('updateSKTP/{id}', [App\Http\Controllers\HomeController::class, 'updateSKTP'])->name('updateSKTP')->middleware('admin');    
 
 Route::post('updateMessageSKTP/{id}', [App\Http\Controllers\HomeController::class, 'updateMessageSKTP'])->name('updateMessageSKTP')->middleware('admin');    
+
+
 
 
 

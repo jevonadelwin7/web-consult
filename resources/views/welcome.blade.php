@@ -18,32 +18,54 @@
             body {
                 font-family: 'Nunito', sans-serif;
             }
+            .button1 {
+  background-color: #0d954d;
+  color: #eee;
+  padding: 15px 25px;
+  border: none;
+}
+.button2 {
+  background-color: #d6336c;
+  color: #eee;
+  padding: 15px 25px;
+  border: none;
+}
+button:hover {
+  background-color: #654700;
+}
         </style>
     </head>
     <body class="antialiased">
         <div class="relative flex items-top justify-center min-h-screen bg-gray-100  sm:items-center py-4 sm:pt-0">
-            @if (Route::has('login'))
-                <div class="hidden fixed top-0 right-0 px-6 py-4 sm:block">
-                    @auth
-                        <a href="{{ url('/home') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Home</a>
-                    @else
-                        <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
-                        @endif
-                    @endauth
-                </div>
-            @endif
+            
 
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 d-block">
                 <h1 class="text-light text-center">Layanan Administrasi, Pelaporan dan Konsultasi Inspektorat Kab. Kep. Mentawai</h1>
-                <div class="mt-3 mx-auto text-center">
+                <div class="mt-3 mx-auto text-center ">
 					<img src="/adminfrontend/assets/img/pemda.png" class="rounded mx-auto d-block" alt="..." height="300" width="250">	
-			
-				</div>
+                    @if (Route::has('login'))
+                    <div class="login-pane">
+                        @auth
+                        @if (auth()->user()->is_admin == 0 || auth()->user()->is_admin == 2)
+                            <a href="{{ url('/home') }}" class="text-sm text-gray-700 dark:text-gray-500 underline"><button type="button" class="btn button1 btn-primary">Home</button></a>
+                        @else
+                        <a href="{{ url('/admin/home') }}" class="text-sm text-gray-700 dark:text-gray-500 underline"><button type="button" class="btn btn-primary">Home</button></a>
+                        @endif
+                        @else
+                        
+                        <button type="button" class="btn button1 btn-primary"><a href="{{ route('login') }}" class="text-sm text-white dark:text-white-500 underline">Login</a></button>
+                        @if (Route::has('register'))
+                        <button type="button" class="btn button2 btn-primary"><a href="{{ route('register') }}" class="ml-4 text-sm text-white dark:text-white-500 underline">Register</a></button>    
+                        
+                        @endif
+                    @endauth
 
+                    </div>
+                    @endif
+				</div>
+                
             </div>
+            
         </div>
     </body>
 </html>

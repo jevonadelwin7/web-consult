@@ -81,25 +81,6 @@
 					</div>
 					<h4 class="page-title">Data Konsultasi</h4>
 					<div class="row">
-						{{-- <div class="col-sm-6 col-md-4">
-							<div class="card card-stats card-primary card-round">
-								<div class="card-body">
-									<div class="row">
-										<div class="col-5">
-											<div class="icon-big text-center">
-												<i class="flaticon-users"></i>
-											</div>
-										</div>
-										<div class="col-7 col-stats">
-											<div class="numbers">
-												<p class="card-category">Konsultasi Baru</p>
-												<h4 class="card-title">12</h4>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div> --}}
 						<div class="col-sm-6 col-md-4">
 							<div class="card card-stats card-info card-round">
 								<div class="card-body">
@@ -132,6 +113,48 @@
 											<div class="numbers">
 												<p class="card-category">Konsultasi Selesai</p>
 												<h4 class="card-title">{{$totConsDone}}</h4>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+					<h4 class="page-title">Data Pengaduan</h4>
+					<div class="row">
+						<div class="col-sm-6 col-md-4">
+							<div class="card card-stats card-danger card-round">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-5">
+											<div class="icon-big text-center">
+												<i class="flaticon-message"></i>
+											</div>
+										</div>
+										<div class="col-7 col-stats">
+											<div class="numbers">
+												<p class="card-category">Menunggu Balasan</p>
+												<h4 class="card-title">{{$totAduan}}</h4>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-4">
+							<div class="card card-stats card-success card-round">
+								<div class="card-body ">
+									<div class="row">
+										<div class="col-5">
+											<div class="icon-big text-center">
+												<i class="flaticon-success"></i>
+											</div>
+										</div>
+										<div class="col-7 col-stats">
+											<div class="numbers">
+												<p class="card-category">Laporan ditindaklanjut</p>
+												<h4 class="card-title">{{$totAduanDone}}</h4>
 											</div>
 										</div>
 									</div>

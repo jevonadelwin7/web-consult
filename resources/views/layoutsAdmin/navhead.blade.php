@@ -264,7 +264,7 @@
 								</ul>
 							</div>
 						</li> 
-						<li class="nav-item {{ request()->is('konsultasi_online/daftar_konsultasi','admin/layanan_informasi/peraturan_daerah')? 'active':''}}">
+						<li class="nav-item {{ request()->is('konsultasi_online/daftar_konsultasi','konsultasi_online/daftar_pengaduan','konsultasi_online/daftar_pengaduan/detail_aduan/*')? 'active':''}}">
 							<a data-toggle="collapse" href="#rules">
 								<i class="
 								fas fa-newspaper"></i>
@@ -279,7 +279,7 @@
 										</a>
 									</li>
 									<li>
-										<a href="#">
+										<a href="/konsultasi_online/daftar_pengaduan">
 											<span class="sub-item">Daftar Pengaduan</span>
 										</a>
 									</li>

@@ -92,6 +92,11 @@
 										</div>
 										<div class="timeline-body">
 											<p>{{$item->message}}</p>
+                                            @if ($item->consult_file == NULL)
+                                                
+                                            @else
+                                            <a href="/adminfrontend/consultfile/{{$item->consult_file}}" target="_blank" class="text-center bg-white">Download File</a>
+                                            @endif
 										</div>
 									</div>
 								</li>

@@ -125,6 +125,12 @@
                                             </form>
                                             @else
                                             <p>{{$item->message}}</p>
+                                            @if ($item->consult_file == NULL)
+                                                
+                                            @else
+                                            <a href="/adminfrontend/consultfile/{{$item->consult_file}}" target="_blank" class="text-center bg-white">Download File</a>
+                                            @endif
+                                            
                                             @endif
 										</div>
                                        <hr>
@@ -185,6 +191,16 @@
                                 <label for="comment">Berikan Tanggapan</label>
                                 <textarea class="form-control" id="comment" name="comment" rows="5" style="border:solid 1px orange"></textarea>
                             </div>
+                            <div class="form-group">
+                                <label for="largeInput">Upload File</label>
+                                <input type="file" class="form-control-file @error('files') is-invalid @enderror" name="files">
+                                @error('files')
+                                <div class="alert alert-danger mt-2">
+                                    {{ $message }}
+                                </div>
+                                @enderror 
+
+                            </div> 
                             <div class="card-action">
                                 <button  type="submit" class="btn btn-success">Kirim</button>
                                 {{-- <button class="btn btn-danger">Cancel</button> --}}
@@ -235,7 +251,7 @@
                     
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Tambah Data</button>
+                
                 </div>
                     
             </div>
